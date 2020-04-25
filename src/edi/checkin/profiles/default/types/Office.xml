@@ -10,7 +10,7 @@
       name="title">Office</property>
   <property
       i18n:translate=""
-      name="description">You can checkin to this office</property>
+      name="description">An Office you can checkin into</property>
 
   <property name="allow_discussion">False</property>
   <property name="factory">Office</property>
@@ -21,18 +21,17 @@
   <property name="global_allow">True</property>
   <property name="filter_content_types">True</property>
   <property name="allowed_content_types">
-    <element value="Checkin" />
-      <!--
+  <!--
     <element value="Document" />
     <element value="File" />
   -->
   </property>
   <!-- Schema, class and security -->
   <property name="add_permission">edi.checkin.AddOffice</property>
-  <property name="klass">plone.dexterity.content.Container</property>
-  <property name="model_file">edi.checkin.content:office.xml</property>
+  <property name="klass">edi.checkin.content.office.Office</property>
+  <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema"></property>
+  <property name="schema">edi.checkin.content.office.IOffice</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">

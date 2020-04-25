@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from edi.checkin.content.office import IOffice  # NOQA E501
 from edi.checkin.testing import EDI_CHECKIN_INTEGRATION_TESTING  # noqa
 from plone import api
 from plone.api.exc import InvalidParameterError
@@ -11,11 +12,6 @@ from zope.component import queryUtility
 import unittest
 
 
-try:
-    from plone.dexterity.schema import portalTypeToSchemaName
-except ImportError:
-    # Plone < 5
-    from plone.dexterity.utils import portalTypeToSchemaName
 
 
 class OfficeIntegrationTest(unittest.TestCase):
@@ -31,8 +27,7 @@ class OfficeIntegrationTest(unittest.TestCase):
     def test_ct_office_schema(self):
         fti = queryUtility(IDexterityFTI, name='Office')
         schema = fti.lookupSchema()
-        schema_name = portalTypeToSchemaName('Office')
-        self.assertEqual(schema_name, schema.getName())
+        self.assertEqual(IOffice, schema)
 
     def test_ct_office_fti(self):
         fti = queryUtility(IDexterityFTI, name='Office')
@@ -43,6 +38,12 @@ class OfficeIntegrationTest(unittest.TestCase):
         factory = fti.factory
         obj = createObject(factory)
 
+        self.assertTrue(
+            IOffice.providedBy(obj),
+            u'IOffice not provided by {0}!'.format(
+                obj,
+            ),
+        )
 
     def test_ct_office_adding(self):
         setRoles(self.portal, TEST_USER_ID, ['Contributor'])
@@ -52,6 +53,12 @@ class OfficeIntegrationTest(unittest.TestCase):
             id='office',
         )
 
+        self.assertTrue(
+            IOffice.providedBy(obj),
+            u'IOffice not provided by {0}!'.format(
+                obj.id,
+            ),
+        )
 
         parent = obj.__parent__
         self.assertIn('office', parent.objectIds())
