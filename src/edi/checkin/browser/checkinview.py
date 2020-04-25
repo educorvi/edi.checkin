@@ -94,12 +94,17 @@ class CheckinForm(AutoExtensibleForm, form.Form):
     @button.buttonAndHandler(u'Checkin durchführen')
     def handleApply(self, action):
         data, errors = self.extractData()
+        url = self.context.absolute_url()
         if errors:
-            url = ploneapi.portal.get().absolute_url() + '/checkin'
             ploneapi.portal.show_message(message="Bitte trage Deine E-Mail-Adresse ein und versuche es erneut.", request=self.request, type='error')
             return self.request.response.redirect(url)
 
-        url = ploneapi.portal.get().absolute_url() + '/checked-message'
+        if data.get('email') not in self.context.adressen:
+            ploneapi.portal.show_message(message="Mit dieser E-Mail-Adresse kannst Du nicht in dieses Office einchecken.", 
+                                         request=self.request, type='error')
+            return self.request.response.redirect(url)
+
+        url += '/checked-message'
         if data.get('rules') and data.get('healthy'):
             data['status'] = u'success'
             data['class'] = u'card border-success'
@@ -115,5 +120,5 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         
         mails = self.sendmails(data)
 
-        url = url + '?status=%s&class=%s&date=%s' %(data.get('status'), data.get('class'), data.get('date'))        
+        url += '?status=%s&class=%s&date=%s' %(data.get('status'), data.get('class'), data.get('date'))        
         return self.request.response.redirect(url)
