@@ -18,4 +18,13 @@
       directory="static"
       />
 
+  <browser:page
+    name="check-in"
+    for="edi.checkin.content.office.IOffice"
+    class=".checkinview.CheckinForm"
+    permission="zope2.View"
+  />
+
+
+
 </configure>

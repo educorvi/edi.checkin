@@ -62,11 +62,11 @@
 
   <!-- View information -->
   <property name="add_view_expr">string:${folder_url}/++add++Office</property>
-  <property name="default_view">view</property>
+  <property name="default_view">check-in</property>
   <property name="default_view_fallback">False</property>
-  <property name="immediate_view">view</property>
+  <property name="immediate_view">check-in</property>
   <property name="view_methods">
-    <element value="view"/>
+    <element value="check-in"/>
   </property>
 
   <!-- Method aliases -->

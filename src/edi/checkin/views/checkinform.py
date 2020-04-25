@@ -24,7 +24,7 @@ import plone.app.z3cform
 import plone.z3cform.templates
 
 
-from edi.classroom import _
+from edi.checkin import _
 
 class ICheckin(model.Schema):
 
