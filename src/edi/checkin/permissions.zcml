@@ -6,6 +6,12 @@
   <configure zcml:condition="installed AccessControl.security">
   <!-- -*- extra stuff goes here -*- -->
 
+    <permission
+        id="edi.checkin.AddOffice"
+        title="edi.checkin: Add Office"
+    />
+
+
 
   </configure>
 
