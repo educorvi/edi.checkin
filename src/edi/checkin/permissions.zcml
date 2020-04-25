@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.checkin.AddCheckin"
+        title="edi.checkin: Add Checkin"
+    />
+
+
+    <permission
         id="edi.checkin.AddOffice"
         title="edi.checkin: Add Office"
     />
