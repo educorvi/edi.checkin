@@ -55,7 +55,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         #m.update(encodestring(data.get('email').encode('utf-8')))
         m.update(heute)
         m.update(portal)
-        url = self.context.absolute_url() + '/checkcheckin?email=%s&checksum=%s" %(encodestring(data.get('email').encode('utf-8')), m.hexdigest())'
+        url = self.context.absolute_url() + "/checkcheckin?email=%s&checksum=%s" %(encodestring(data.get('email').encode('utf-8')), m.hexdigest())
         filename = "qr.png" #here we need a Temporary File
         img = qrcode.make(url)
         img.save(filename)

@@ -16,7 +16,7 @@
 
   <browser:page
     name="checked-message"
-    for="Products.CMFCore.interfaces.IFolderish"
+    for="*"
     class=".checked_message.CheckedMessage"
     template="checked_message.pt"
     permission="zope2.View"
