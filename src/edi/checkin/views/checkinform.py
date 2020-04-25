@@ -51,7 +51,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         heute = datetime.datetime.now().strftime('%d.%m.%Y').encode('utf-8')
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
         m = hashlib.sha256()
-        m.update(encodestring(data.get('email').encode('utf-8')))
+        #m.update(encodestring(data.get('email').encode('utf-8')))
         m.update(heute)
         m.update(portal)
         url = "https://www.educorvi.de/checkcheckin?email=%s&checksum=%s" %(encodestring(data.get('email').encode('utf-8')), m.hexdigest())

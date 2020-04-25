@@ -755,7 +755,7 @@ def create_userbody(data):
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p><strong>Du hast bis am edi__datum in der Zeit von 8:45 Uhr - 15:15 Uhr Zutritt zur LetraFactory.</strong></p>
+                        <p><strong>Du hast am edi__datum in der Zeit von 8:45 Uhr - 15:15 Uhr Zutritt zur LetraFactory.</strong></p>
                         <p>Du musst den Checkin wiederholen, wenn Du versehentlich falsche Angaben gemacht hast.
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
