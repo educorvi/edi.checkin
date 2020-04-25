@@ -28,21 +28,22 @@ from edi.checkin import _
 
 class ICheckin(model.Schema):
 
-    email = schema.TextLine(title=u"Meine E-Mail-Adresse", required=True)
-    rules = schema.Bool(title=u"Ich habe die Regeln zum Infektionsschutz befolgt. Es gelten die Regeln des Bundeslandes in dem Du wohnst.", 
-                        description=u"Es gelten die Regeln des Bundeslandes indem Du Deinen Hauptwohnsitz hast.",
+    email = schema.TextLine(title=_(u"Meine E-Mail-Adresse"), required=True)
+    rules = schema.Bool(title=_(u"Ich habe die Regeln zum Infektionsschutz befolgt. Es gelten die Regeln des Bundeslandes in dem Du wohnst."), 
+                        description=_(u"Es gelten die Regeln des Bundeslandes indem Du Deinen Hauptwohnsitz hast."),
                         required=True)
 
-    healthy = schema.Bool(title=u"Ich fühle mich gesund und fit. Ich habe keine Erkältungssymptome. Ich habe kein Fieber oder trockenen Husten.",
-                         description=u"Ich habe keine Erkältungssymptome. Ich habe kein Fieber und keinen trockenen Husten.",
+    healthy = schema.Bool(title=_(u"Ich fühle mich gesund und fit. Ich habe keine Erkältungssymptome. Ich habe kein Fieber oder trockenen Husten."),
+                         description=_(u"Ich habe keine Erkältungssymptome. Ich habe kein Fieber und keinen trockenen Husten."),
                          required=True)
 
 
 class CheckinForm(AutoExtensibleForm, form.Form):
 
-    label = u"Check In"
-    description = u"Ein erfolgreich durchgeführter Checkin ist Voraussetzung für den Zutritt zu diesem Büro.\
-                    Zur Gewährleistung des Infektionsschutzes besteht eine Pflicht zu wahren und vollständigen Angaben."
+    label = _(u"Check In")
+    description = _(u"Ein erfolgreich durchgeführter Checkin ist Voraussetzung für den Zutritt zu diesem Büro.\
+                    Zur Gewährleistung des Infektionsschutzes besteht eine Pflicht zu wahren und vollständigen Angaben.")
+
     ignoreContext = True
 
     schema = ICheckin
@@ -54,8 +55,8 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         #m.update(encodestring(data.get('email').encode('utf-8')))
         m.update(heute)
         m.update(portal)
-        url = "https://www.educorvi.de/checkcheckin?email=%s&checksum=%s" %(encodestring(data.get('email').encode('utf-8')), m.hexdigest())
-        filename = "qr.png"
+        url = self.context.absolute_url() + '/checkcheckin?email=%s&checksum=%s" %(encodestring(data.get('email').encode('utf-8')), m.hexdigest())'
+        filename = "qr.png" #here we need a Temporary File
         img = qrcode.make(url)
         img.save(filename)
         return img
@@ -63,9 +64,9 @@ class CheckinForm(AutoExtensibleForm, form.Form):
     def sendmails(self, data):
         mime_msg = MIMEMultipart('related')
         mime_msg['Subject'] = u"Status des Checkins: %s (%s)" %(data.get('status'), data.get('email'))
-        mime_msg['From'] = u"educorvi@web.de"
+        mime_msg['From'] = u"educorvi@web.de" #replace with portal from address
         mime_msg['To'] = data.get('email')
-        mime_msg['CC'] = 'info@educorvi.de'
+        #mime_msg['CC'] = 'info@educorvi.de' #We don't need because we create a Checkin Object
         mime_msg.preamble = 'This is a multi-part message in MIME format.'
         msgAlternative = MIMEMultipart('alternative')
         mime_msg.attach(msgAlternative)
