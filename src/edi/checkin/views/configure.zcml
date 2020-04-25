@@ -23,6 +23,14 @@
     />
 
   <browser:page
+    name="checked-hint"
+    for="*"
+    class=".checked_hint.CheckedMessage"
+    template="checked_hint.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
     name="checkin"
     for="*"
     class=".checkinform.CheckinForm"

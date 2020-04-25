@@ -20,10 +20,11 @@
          </div>
             <div class="card-body">
               <h5 class="card-title" tal:condition="python: view.status == 'success'">
-                 Du hast am <span tal:replace="view/date"/> in der Zeit von 8:45 Uhr bis 15:15 Uhr Zutritt zur LetraFactory</h5>
+                 Du hast am <span tal:replace="view/date"/> in der Zeit von <span tal:replace="view/start"/> Uhr 
+                 bis <span tal:replace="view/end"/> Uhr Zutritt für das Office <span tal:replace="context/title"/></h5>
               <p class="card-text" tal:condition="python: view.status == 'success'">Solltest Du versehentlich falsche Angaben gemacht haben 
                  musst Du den Checkin wiederholen.<br/><br>
-                 Deinen LetraFactory Pass erhältst Du per E-Mail.</p>
+                 Deinen <span tal:replace="context/title"/> Pass erhältst Du per E-Mail.</p>
               <h5 class="card-title" tal:condition="python: view.status == 'fail'">
                  Du hast bis zum <span tal:replace="view/date"/> keinen Zutritt zur LetraFactory. </h5>
               <p class="card-text" tal:condition="python: view.status == 'fail'">Du darfst den Checkin nur wiederholen,

@@ -48,6 +48,30 @@ class CheckinForm(AutoExtensibleForm, form.Form):
 
     schema = ICheckin
 
+    def check_times(self):
+        b_hour = int(self.context.beginn.split(':')[0])
+        b_minutes = int(self.context.beginn.split(':')[1])
+        beginn = datetime.time(b_hour, b_minutes)
+        e_hour = int(self.context.ende.split(':')[0])
+        e_minutes = int(self.context.ende.split(':')[1])
+        ende = datetime.time(e_hour, e_minutes)
+        heute = datetime.date.today()
+        jetzt = datetime.time(datetime.datetime.now().hour, datetime.datetime.now().minute)
+        if jetzt <= beginn:
+            start = datetime.datetime.combine(heute, beginn)
+            end = datetime.datetime.combine(heute, beginn) + datetime.timedelta(hours=self.context.maxtime)
+            return (start, end)
+        elif beginn < jetzt < ende:
+            start = datetime.datetime.combine(heute, jetzt)
+            finaltime = datetime.datetime.combine(heute, ende)
+            if (start + dateime.timedelta(hours=self.context.maxtime)) <= finaltime:
+                end = start + datetime.timedelta(hours=self.context.maxtime)
+            else:
+                end = finaltime
+            return (start, end)
+        else:
+            return None
+
     def create_qrcode(self, data):
         heute = datetime.datetime.now().strftime('%d.%m.%Y').encode('utf-8')
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
@@ -104,21 +128,31 @@ class CheckinForm(AutoExtensibleForm, form.Form):
                                          request=self.request, type='error')
             return self.request.response.redirect(url)
 
-        url += '/checked-message'
+        url += '/checked-hint'
         if data.get('rules') and data.get('healthy'):
-            data['status'] = u'success'
-            data['class'] = u'card border-success'
-            data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
-            qrimage = self.create_qrcode(data)
-            qrfile = open('qr.png', 'rb')
-            qrfile.seek(0)
-            data['qrimage'] = '<img src="cid:image1" alt="img" />'
+            checktimes = self.check_times()
+            if checktimes:
+                data['status'] = u'success'
+                data['class'] = u'card border-success'
+                data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
+                data['start'] = checktimes[0].strftime('%H:%M')
+                data['end'] = checktimes[1].strftime('%H:%M')
+                qrimage = self.create_qrcode(data)
+                qrfile = open('qr.png', 'rb')
+                qrfile.seek(0)
+                data['qrimage'] = '<img src="cid:image1" alt="img" />'
+            else:
+                data['status'] = u'warning'
+                data['class'] = u'card text-white bg-warning'
+                data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
         else:
             data['status'] = u'fail'
             data['class'] = u'card text-white bg-danger'
             data['date'] = (datetime.datetime.now() + datetime.timedelta(days=14)).strftime('%d.%m.%Y')
-        
-        mails = self.sendmails(data)
 
-        url += '?status=%s&class=%s&date=%s' %(data.get('status'), data.get('class'), data.get('date'))        
+        if data['status'] in ['success', 'fail']:        
+            mails = self.sendmails(data)
+
+        url += '?status=%s&class=%s&date=%s&start=%s&end=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
+                                                               data.get('end'))        
         return self.request.response.redirect(url)
