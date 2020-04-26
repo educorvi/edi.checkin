@@ -15,7 +15,8 @@ class IOffice(model.Schema):
     adressen = schema.List(title=_(u"Gültige E-Mail-Adressen für diesen Raum"),
                            description=_(u"Hier legen Sie fest, welche Adressen für diesen Raum einchecken dürfen. Wenn hier keine\
                                          Adressen eingetragen wurden findet auch keine Überprüfung der Adressen statt."),
-                           value_type=schema.TextLine())
+                           value_type=schema.TextLine(),
+                           required=False)
 
     beginn = schema.TextLine(title=_(u"Frühester Arbeitsbeginn in diesem Office (Format: HH:MM)"),
                              required=True)

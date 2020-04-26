@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def create_userbody(data, checktimes):
+def create_userbody(data, checktimes, title):
     successbody = """\
 <!doctype html>
 <html>
@@ -721,7 +721,7 @@ def create_userbody(data, checktimes):
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader">CheckIn LetraFactory</span>
+            <span class="preheader">CheckIn edi__title</span>
 
             <!-- START HEADER -->
             <div class="header">
@@ -755,7 +755,7 @@ def create_userbody(data, checktimes):
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p><strong>Du hast am edi__datum in der Zeit von edi__start Uhr - edi__end Uhr Zutritt zur LetraFactory.</strong></p>
+                        <p><strong>Du hast am edi__datum in der Zeit von edi__start Uhr - edi__end Uhr Zutritt zum Office edi__title.</strong></p>
                         <p>Du musst den Checkin wiederholen, wenn Du versehentlich falsche Angaben gemacht hast.
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
@@ -814,4 +814,5 @@ def create_userbody(data, checktimes):
     successbody = successbody.replace('edi__qrimage', data.get('qrimage'))
     successbody = successbody.replace('edi__start', checktimes[0].strftime('%H:%M'))
     successbody = successbody.replace('edi__end', checktimes[1].strftime('%H:%M'))
+    successbody = successbody.replace('edi__title', title)
     return successbody

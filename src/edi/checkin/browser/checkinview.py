@@ -135,9 +135,9 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         mime_msg.attach(msgAlternative)
 
         if data.get('status') == 'success':
-            htmltext = successbody(data, checktimes)
+            htmltext = successbody(data, checktimes, self.context.title)
         else:
-            htmltext = dangerbody(data)
+            htmltext = dangerbody(data, self.context.title)
 
         msg_txt = MIMEText(htmltext, _subtype='html', _charset='utf-8')
         msgAlternative.attach(msg_txt)

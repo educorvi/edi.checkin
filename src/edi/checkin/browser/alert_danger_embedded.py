@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def create_userbody(data):
+def create_userbody(data, title):
     dangerbody = """\
 <!doctype html>
 <html>
@@ -721,7 +721,7 @@ def create_userbody(data):
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader">CheckIn LetraFactory</span>
+            <span class="preheader">CheckIn edi__title</span>
 
             <!-- START HEADER -->
             <div class="header">
@@ -755,7 +755,7 @@ def create_userbody(data):
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p><strong>Du hast bis zum edi__datum keinen Zutritt zur LetraFactory.</strong></p>
+                        <p><strong>Du hast bis zum edi__datum keinen Zutritt zum Office edi__title</strong></p>
                         <p>Du darfst den Checkin nur wiederholen, wenn Du versehentlich falsche Angaben gemacht hast.</p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
@@ -807,4 +807,6 @@ def create_userbody(data):
     </table>
   </body>
 </html>"""
-    return dangerbody.replace('edi__datum', data.get('date'))
+    dangerbody = dangerbody.replace('edi__datum', data.get('date'))
+    dangerbody = dangerbody.replace('edi__title', title)
+    return dangerbody

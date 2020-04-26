@@ -1,44 +1,54 @@
-.. This README is meant for consumption by humans and pypi. Pypi can render rst files so please do not use Sphinx features.
-   If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide.html
-   This text does not appear on pypi or github. It is a comment.
-
 ===========
 edi.checkin
 ===========
 
-Tell me what your product does
+Mit diesem Plone Add-On kann der Zutritt zu Büros, Besprechungs- oder Veranstaltungsräumen mittels Check-In Verfahren geregelt werden.
+Das Add-On wurde entwickelt, um umsichtige, verantwortungsvolle und individuelle Lösungen zur Sicherstellung des Infektionsschutzes im 
+Zuge der Corona [COVID-19] Pandemie zu ermöglichen.
+
+Eine Person, die das Checkin Verfahren nutzt, macht folgende Angaben:
+
+1. Die eigene E-Mail-Adresse
+2. Eine Bestätigung, dass die aktuell gültigen Regelungen zum Infektionsschutz (im jeweiligen Bundesland) befolgt wurden.
+3. Eine Bestätigung der persönlichen Gesundheit und Fitness, Fieber oder trockener Husten wird explizit ausgeschlossen. 
+
+Für den entsprechenden Raum können folgende Dinge festgelegt werden:
+
+- Name des Raumes
+- Maximale Besetzung des Raumes
+- Maximale Aufenthaltsdauer einer Person im Raum
+- Festlegung der Arbeitszeiten (Bürozeiten) in dem betreffenden Raum
+- optional: Festlegung bzw. Identifikation der für den betreffenden Raum zugelassenen Personen mittels E-Mail-Adresse
 
 Features
 --------
 
-- Can be bullet points
-
+- Inhaltstyp "Office" = Container
+- Inhaltstyp "Checkin" = Item (können nur im Inhaltstyp Office angelegt werden)
+- Formular für den Checkin als Standardansicht des Inhaltstyps Office
+- View zur Bestätigung des Checkins bzw. zur Ablehnung des Zutritts zum Office
+- E-Mail mit Check-In Card incl. QR-Code zur Online-Prüfung der Gültigkeit 
+- E-Mail mit Bescheid bei Ablehnung des Zutritts
+- Online-Verfahren zur Gültigkeitsprüfung des QR-Codes
+- Durch Speicherung der "Checkin" Objekte im Ordner "Office" können nachträglich mögliche Infektionsketten zurückverfolgt werden
 
 Examples
 --------
 
-This add-on can be seen in action at the following sites:
-- Is there a page on the internet where everybody can see the features?
+Ein Beispiel kann unter folgender URL aufgerufen werden:
 
-
-Documentation
--------------
-
-Full documentation for end users can be found in the "docs" folder, and is also available online at http://docs.plone.org/foo/bar
+https://www.educorvi.de/letrafactory
 
 
 Translations
 ------------
 
-This product has been translated into
-
-- Klingon (thanks, K'Plai)
-
+Das Add-On steht momentan ausschließlich in Deutscher Sprache zur Verfügung.
 
 Installation
 ------------
 
-Install edi.checkin by adding it to your buildout::
+Installation von edi.checkin durch Hinzufügen des Add-Ons zur buildout.cfg::
 
     [buildout]
 
@@ -48,23 +58,20 @@ Install edi.checkin by adding it to your buildout::
         edi.checkin
 
 
-and then running ``bin/buildout``
+Danach Ausführung von: ``bin/buildout``
 
 
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/collective/edi.checkin/issues
-- Source Code: https://github.com/collective/edi.checkin
-- Documentation: https://docs.plone.org/foo/bar
+- Issue Tracker: https://github.com/educorvi/edi.checkin/issues
+- Source Code: https://github.com/educorvi/edi.checkin
 
 
 Support
 -------
 
-If you are having issues, please let us know.
-We have a mailing list located at: project@example.com
-
+info@educorvi.de
 
 License
 -------
