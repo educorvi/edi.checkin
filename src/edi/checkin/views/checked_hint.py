@@ -18,4 +18,5 @@ class CheckedMessage(BrowserView):
         self.date = self.request.get('date')
         self.start = self.request.get('start')
         self.end = self.request.get('end')
+        self.reason = self.request.get('reason')
         return self.index()

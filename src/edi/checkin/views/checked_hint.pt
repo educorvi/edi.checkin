@@ -29,10 +29,21 @@
                  Du hast bis zum <span tal:replace="view/date"/> keinen Zutritt zur LetraFactory. </h5>
               <p class="card-text" tal:condition="python: view.status == 'fail'">Du darfst den Checkin nur wiederholen,
                  wenn Du versehentlich falsche Angaben gemacht hast.</p>
-              <h5 class="card-title" tal:condition="python: view.status == 'warning'">
+
+              <h5 class="card-title" tal:condition="python: view.status == 'warning' and view.reason == 'outoftime'">
                  Am heutigen Tag (<span tal:replace="view/date"/>) ist kein Checkin mehr möglich. </h5>
-              <p class="card-text" tal:condition="python: view.status == 'warning'">Ein Checkin ist nur für den aktuellen Arbeitstag und
-                 auch nur vor oder während der täglichen Bürozeit möglich.</p>
+              <p class="card-text" tal:condition="python: view.status == 'warning' and view.reason == 'outoftime'">Ein Checkin ist 
+                 nur für den aktuellen Arbeitstag und auch nur vor oder während der täglichen Bürozeit möglich.</p>
+
+              <h5 class="card-title" tal:condition="python: view.status == 'warning' and view.reason == 'alreadychecked'">
+                 Du bist für den heutigen Tag (<span tal:replace="view/date"/>) bereits eingechecked </h5>
+              <p class="card-text" tal:condition="python: view.status == 'warning' and view.reason == 'alreadychecked'">Bitte prüfe Deinen
+                 E-Mail Posteingang und prüfe eventuell auch den SPAM-Ordner. Bei Unstimmigkeiten verwende bitte das Kontaktformular.</p>
+
+              <h5 class="card-title" tal:condition="python: view.status == 'warning' and view.reason == 'maxpersons'">
+                 Am heutigen Tag (<span tal:replace="view/date"/>) ist kein Checkin mehr möglich. </h5>
+              <p class="card-text" tal:condition="python: view.status == 'warning' and view.reason == 'maxpersons'">Die Höchstzahl an
+                 zugelassenen Personen ist für diesen Tag bereits erreicht. Bitte versuche es morgen erneut.</p>
             </div>
         </div>
 

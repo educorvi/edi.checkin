@@ -82,30 +82,52 @@ class CheckinForm(AutoExtensibleForm, form.Form):
             ),
             'range': 'min:max',
         }
-        brains = ploneapi.content.find(context=self.context, portal_type="Checkin", start=date_range)
-        print(brains)
-        self.create_checkin(email, checktimes)
+        office_path = '/'.join(self.context.getPhysicalPath())
+        portal_catalog = ploneapi.portal.get_tool('portal_catalog')
+        brains = portal_catalog.unrestrictedSearchResults(portal_type="Checkin", path=office_path, start=date_range, Title=email)
+        if len(brains) > 0:
+            return {'status':'warning', 'reason':u'alreadychecked'}
+        brains = portal_catalog.unrestrictedSearchResults(portal_type="Checkin", path=office_path, start=date_range)
+        if len(brains) >= self.context.maxperson:
+            return {'status':'warning', 'reason':u'maxpersons'}
+        retcode = self.create_checkin(email, checktimes)
+        if retcode == 201:
+            return {'status':'success'}
+        return {'status':'error'}
 
     def create_checkin(self, email, checktimes):
-        objjson = {'@type':'Checkin', 'title':email, 'start':checktimes[0].isoformat(), 'end':checktimes[1].isoformat()}
-        requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
-                      json=objjson, auth=('admin', 'krks.d3print'))         
-
-
-    def create_qrcode(self, data):
-        heute = datetime.datetime.now().strftime('%d.%m.%Y').encode('utf-8')
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
         m = hashlib.sha256()
-        #m.update(encodestring(data.get('email').encode('utf-8')))
-        m.update(heute)
         m.update(portal)
-        url = self.context.absolute_url() + "/checkcheckin?email=%s&checksum=%s" %(encodestring(data.get('email').encode('utf-8')), m.hexdigest())
+        m.update(datetime.date.today().isoformat().encode('utf-8'))
+        m.update(email.encode('utf-8'))
+        objid = m.hexdigest()
+        objjson = {'@type':'Checkin', 'id':objid, 'title':email, 'start':checktimes[0].isoformat(), 'end':checktimes[1].isoformat()}
+        try:
+            retcode = requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
+                                    json=objjson, auth=('admin', 'krks.d3print'))
+            status = retcode.status_code
+        except:
+            print('Error Second Request')
+            status = 500
+        return status
+
+    def create_qrcode(self, data, checktimes):
+        portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
+        m = hashlib.sha256()
+        m.update(portal)
+        m.update(datetime.date.today().isoformat().encode('utf-8'))
+        m.update(data.get('email').encode('utf-8'))
+        checksum = m.hexdigest()
+        startzeit = encodestring(checktimes[0].isoformat().encode('utf-8'))
+        endzeit = encodestring(checktimes[1].isoformat().encode('utf-8'))
+        url = self.context.absolute_url() + "/checkinchecker?checksum=%s&start=%s&end=%s" %(checksum, startzeit, endzeit)
         filename = "qr.png" #here we need a Temporary File
         img = qrcode.make(url)
         img.save(filename)
         return img
     
-    def sendmails(self, data):
+    def sendmails(self, data, checktimes):
         mime_msg = MIMEMultipart('related')
         mime_msg['Subject'] = u"Status des Checkins: %s (%s)" %(data.get('status'), data.get('email'))
         mime_msg['From'] = u"educorvi@web.de" #replace with portal from address
@@ -123,7 +145,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         msg_txt = MIMEText(htmltext, _subtype='html', _charset='utf-8')
         msgAlternative.attach(msg_txt)
 
-        img = self.create_qrcode(data)
+        img = self.create_qrcode(data, checktimes)
         qrimage = open('qr.png', 'rb')
         qrimage.seek(0)
         msgImage = MIMEImage(qrimage.read())
@@ -148,32 +170,44 @@ class CheckinForm(AutoExtensibleForm, form.Form):
                                          request=self.request, type='error')
             return self.request.response.redirect(url)
 
-        url += '/checked-hint'
         if data.get('rules') and data.get('healthy'):
             checktimes = self.check_times()
             if checktimes:
-                data['status'] = u'success'
-                data['class'] = u'card border-success'
-                data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
-                data['start'] = checktimes[0].strftime('%H:%M')
-                data['end'] = checktimes[1].strftime('%H:%M')
-                qrimage = self.create_qrcode(data)
-                qrfile = open('qr.png', 'rb')
-                qrfile.seek(0)
-                data['qrimage'] = '<img src="cid:image1" alt="img" />'
                 checkpersons = self.check_persons(data.get('email'), checktimes)
+                if checkpersons.get('status') == u'warning':
+                    data['status'] = u'warning'
+                    data['class'] = u'card text-white bg-warning'
+                    data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
+                    data['reason'] = checkpersons.get('reason')
+                elif checkpersons.get('status') == u'success':
+                    data['status'] = u'success'
+                    data['class'] = u'card border-success'
+                    data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
+                    data['start'] = checktimes[0].strftime('%H:%M')
+                    data['end'] = checktimes[1].strftime('%H:%M')
+                    #qrimage = self.create_qrcode(data, checktimes)
+                    #qrfile = open('qr.png', 'rb')
+                    #qrfile.seek(0)
+                    data['qrimage'] = '<img src="cid:image1" alt="img" />'
+                    checkpersons = self.check_persons(data.get('email'), checktimes)
+                else:
+                    ploneapi.portal.show_message(message="Ein Fehler ist aufgetreten. Bitte benachrichtige den Administrator.",
+                                                 request=self.request, type='error')
+                    return self.request.response.redirect(url)
             else:
                 data['status'] = u'warning'
                 data['class'] = u'card text-white bg-warning'
                 data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
+                data['reason'] = 'outoftime'
         else:
             data['status'] = u'fail'
             data['class'] = u'card text-white bg-danger'
             data['date'] = (datetime.datetime.now() + datetime.timedelta(days=14)).strftime('%d.%m.%Y')
 
         if data['status'] in ['success', 'fail']:        
-            mails = self.sendmails(data)
+            mails = self.sendmails(data, checktimes)
 
-        url += '?status=%s&class=%s&date=%s&start=%s&end=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
-                                                               data.get('end'))        
+        url += '/checked-hint'
+        url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
+                                                               data.get('end'), data.get('reason'))        
         return self.request.response.redirect(url)
