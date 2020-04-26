@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-
 from plone import api as ploneapi
 import hashlib
 import datetime
+from DateTime import DateTime
 from edi.checkin import _
 from Products.Five.browser import BrowserView
 
@@ -15,18 +15,20 @@ class CheckinChecker(BrowserView):
     # template = ViewPageTemplateFile('check_checkin.pt')
 
     def check(self):
-        import pdb;pdb.set_trace()
-        heute = datetime.datetime.now().strftime('%d.%m.%Y').encode('utf-8')
-        portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
-        m = hashlib.sha256()
-        #m.update(self.request.get('email').encode('utf-8'))
-        m.update(heute)
-        m.update(portal)       
-        refcode = m.hexdigest()
-        if refcode == self.request.get('checksum'):
-            return 'Valid'
-        else:
-            return 'Not Valid' 
+        date_range = {
+            'query': (
+                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(0,0))),
+                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(23,59))),
+            ),
+            'range': 'min:max',
+        }
+        office_path = '/'.join(self.context.getPhysicalPath())
+        portal_catalog = ploneapi.portal.get_tool('portal_catalog')
+        brains = portal_catalog.unrestrictedSearchResults(portal_type="Checkin", path=office_path, id=self.request.get('checksum'))
+        if brains:
+            if brains[0].start <= datetime.datetime.now() <= brains[0].end:
+                return 'Valid'
+        return 'Not Valid'
 
     def __call__(self):
         # Implement your own actions:

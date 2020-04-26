@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 import requests
-from DateTime import DateTime
 import qrcode
-from zope import schema
 import hashlib
+from DateTime import DateTime
+from zope import schema
 from z3c.form import button, form, field
 from plone.supermodel import model
 from plone.autoform import directives
@@ -18,8 +18,8 @@ import z3c.form
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
-from edi.checkin.views.alert_danger_embedded import create_userbody as dangerbody
-from edi.checkin.views.alert_success_embedded import create_userbody as successbody
+from edi.checkin.browser.alert_danger_embedded import create_userbody as dangerbody
+from edi.checkin.browser.alert_success_embedded import create_userbody as successbody
 from base64 import encodestring
 from plone import api as ploneapi
 import plone.app.z3cform
@@ -119,9 +119,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         m.update(datetime.date.today().isoformat().encode('utf-8'))
         m.update(data.get('email').encode('utf-8'))
         checksum = m.hexdigest()
-        startzeit = encodestring(checktimes[0].isoformat().encode('utf-8'))
-        endzeit = encodestring(checktimes[1].isoformat().encode('utf-8'))
-        url = self.context.absolute_url() + "/checkinchecker?checksum=%s&start=%s&end=%s" %(checksum, startzeit, endzeit)
+        url = self.context.absolute_url() + "/checkinchecker?checksum=%s" % checksum
         filename = "qr.png" #here we need a Temporary File
         img = qrcode.make(url)
         img.save(filename)
@@ -132,13 +130,12 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         mime_msg['Subject'] = u"Status des Checkins: %s (%s)" %(data.get('status'), data.get('email'))
         mime_msg['From'] = u"educorvi@web.de" #replace with portal from address
         mime_msg['To'] = data.get('email')
-        #mime_msg['CC'] = 'info@educorvi.de' #We don't need because we create a Checkin Object
         mime_msg.preamble = 'This is a multi-part message in MIME format.'
         msgAlternative = MIMEMultipart('alternative')
         mime_msg.attach(msgAlternative)
 
         if data.get('status') == 'success':
-            htmltext = successbody(data)
+            htmltext = successbody(data, checktimes)
         else:
             htmltext = dangerbody(data)
 
@@ -164,11 +161,12 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         if errors:
             ploneapi.portal.show_message(message="Bitte trage Deine E-Mail-Adresse ein und versuche es erneut.", request=self.request, type='error')
             return self.request.response.redirect(url)
-
-        if data.get('email') not in self.context.adressen:
-            ploneapi.portal.show_message(message="Mit dieser E-Mail-Adresse kannst Du nicht in dieses Office einchecken.", 
-                                         request=self.request, type='error')
-            return self.request.response.redirect(url)
+ 
+        if self.context.adressen:
+            if data.get('email') not in self.context.adressen:
+                ploneapi.portal.show_message(message="Mit dieser E-Mail-Adresse kannst Du nicht in dieses Office einchecken.", 
+                                             request=self.request, type='error')
+                return self.request.response.redirect(url)
 
         if data.get('rules') and data.get('healthy'):
             checktimes = self.check_times()
@@ -185,9 +183,6 @@ class CheckinForm(AutoExtensibleForm, form.Form):
                     data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
                     data['start'] = checktimes[0].strftime('%H:%M')
                     data['end'] = checktimes[1].strftime('%H:%M')
-                    #qrimage = self.create_qrcode(data, checktimes)
-                    #qrfile = open('qr.png', 'rb')
-                    #qrfile.seek(0)
                     data['qrimage'] = '<img src="cid:image1" alt="img" />'
                     checkpersons = self.check_persons(data.get('email'), checktimes)
                 else:
