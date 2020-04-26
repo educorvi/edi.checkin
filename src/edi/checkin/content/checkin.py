@@ -12,8 +12,8 @@ class ICheckin(model.Schema):
     """ Marker interface and Dexterity Python Schema for Checkin
     """
 
-    start = schema.Datetime(title=_(u"Beginn der Checkin-Zeit"))
-    end = schema.Datetime(title=_(u"Ende der Checkin-Zeit"))
+    start = schema.Datetime(title=_(u"Beginn der Checkin-Zeit"), required=False)
+    end = schema.Datetime(title=_(u"Ende der Checkin-Zeit"), required=False)
 
 
 @implementer(ICheckin)

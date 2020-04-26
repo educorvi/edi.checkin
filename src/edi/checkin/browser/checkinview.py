@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
+import requests
+from DateTime import DateTime
 import qrcode
 from zope import schema
 import hashlib
@@ -64,13 +66,31 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         elif beginn < jetzt < ende:
             start = datetime.datetime.combine(heute, jetzt)
             finaltime = datetime.datetime.combine(heute, ende)
-            if (start + dateime.timedelta(hours=self.context.maxtime)) <= finaltime:
+            if (start + datetime.timedelta(hours=self.context.maxtime)) <= finaltime:
                 end = start + datetime.timedelta(hours=self.context.maxtime)
             else:
                 end = finaltime
             return (start, end)
         else:
             return None
+
+    def check_persons(self, email, checktimes):
+        date_range = {
+            'query': (
+                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(0,0))),
+                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(23,59))),
+            ),
+            'range': 'min:max',
+        }
+        brains = ploneapi.content.find(context=self.context, portal_type="Checkin", start=date_range)
+        print(brains)
+        self.create_checkin(email, checktimes)
+
+    def create_checkin(self, email, checktimes):
+        objjson = {'@type':'Checkin', 'title':email, 'start':checktimes[0].isoformat(), 'end':checktimes[1].isoformat()}
+        requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
+                      json=objjson, auth=('admin', 'krks.d3print'))         
+
 
     def create_qrcode(self, data):
         heute = datetime.datetime.now().strftime('%d.%m.%Y').encode('utf-8')
@@ -141,6 +161,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
                 qrfile = open('qr.png', 'rb')
                 qrfile.seek(0)
                 data['qrimage'] = '<img src="cid:image1" alt="img" />'
+                checkpersons = self.check_persons(data.get('email'), checktimes)
             else:
                 data['status'] = u'warning'
                 data['class'] = u'card text-white bg-warning'
