@@ -2,6 +2,8 @@
 edi.checkin
 ===========
 
+@Ideen von Holger Zingsheim
+
 Mit diesem Plone Add-On kann der Zutritt zu Büros, Besprechungs- oder Veranstaltungsräumen mittels Check-In Verfahren geregelt werden.
 Das Add-On wurde entwickelt, um umsichtige, verantwortungsvolle und individuelle Lösungen zur Sicherstellung des Infektionsschutzes im 
 Zuge der Corona [COVID-19] Pandemie zu ermöglichen.
