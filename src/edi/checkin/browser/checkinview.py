@@ -127,6 +127,8 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         mime_msg = MIMEMultipart('related')
         mime_msg['Subject'] = u"Status des Checkins: %s (%s)" %(data.get('status'), data.get('email'))
         mime_msg['From'] = u"educorvi@web.de" #replace with portal from address
+        if data.get('status') == 'fail':
+            mime_msg['CC'] = 'info@educorvi.de'
         mime_msg['To'] = data.get('email')
         mime_msg.preamble = 'This is a multi-part message in MIME format.'
         msgAlternative = MIMEMultipart('alternative')
@@ -140,13 +142,15 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         msg_txt = MIMEText(htmltext, _subtype='html', _charset='utf-8')
         msgAlternative.attach(msg_txt)
 
-        img = self.create_qrcode(data, checktimes)
-        qrimage = open('qr.png', 'rb')
-        qrimage.seek(0)
-        msgImage = MIMEImage(qrimage.read())
 
-        msgImage.add_header('Content-ID', '<image1>')
-        mime_msg.attach(msgImage)
+        if data.get('status') == 'success':
+            img = self.create_qrcode(data, checktimes)
+            qrimage = open('qr.png', 'rb')
+            qrimage.seek(0)
+            msgImage = MIMEImage(qrimage.read())
+
+            msgImage.add_header('Content-ID', '<image1>')
+            mime_msg.attach(msgImage)
 
         mail_host = ploneapi.portal.get_tool(name='MailHost')
         mail_host.send(mime_msg.as_string())
@@ -193,12 +197,13 @@ class CheckinForm(AutoExtensibleForm, form.Form):
                 data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
                 data['reason'] = 'outoftime'
         else:
+            checktimes = None
             data['status'] = u'fail'
             data['class'] = u'card text-white bg-danger'
             data['date'] = (datetime.datetime.now() + datetime.timedelta(days=14)).strftime('%d.%m.%Y')
 
         if data['status'] in ['success', 'fail']:        
-            mails = self.sendmails(data, checktimes=None)
+            mails = self.sendmails(data, checktimes)
 
         url += '/checked-hint'
         url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
