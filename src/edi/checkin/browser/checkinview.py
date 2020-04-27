@@ -200,7 +200,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
             data['date'] = (datetime.datetime.now() + datetime.timedelta(days=14)).strftime('%d.%m.%Y')
 
         if data['status'] in ['success', 'fail']:        
-            mails = self.sendmails(data, checktimes)
+            mails = self.sendmails(data, checktimes=None)
 
         url += '/checked-hint'
         url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
