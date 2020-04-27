@@ -10,8 +10,6 @@ from plone.autoform.form import AutoExtensibleForm
 from collective.beaker.interfaces import ISession
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile as FiveViewPageTemplateFile
 from plone import api as ploneapi
-from edi.classroom.forms.mailconfig import create_edibody
-from edi.classroom.forms.receipt import create_userbody
 import z3c.form
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
