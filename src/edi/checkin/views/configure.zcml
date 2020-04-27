@@ -39,7 +39,7 @@
     />
 
   <browser:page
-    name="checkin"
+    name="checkin-test"
     for="*"
     class=".checkinform.CheckinForm"
     permission="zope2.View"
