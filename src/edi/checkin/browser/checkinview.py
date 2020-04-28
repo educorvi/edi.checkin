@@ -49,6 +49,12 @@ class CheckinForm(AutoExtensibleForm, form.Form):
     schema = ICheckin
 
     def check_times(self):
+        """Prueft, ob der Checkin vor oder während der Bürozeit erfolgt und gibt den möglichen
+           Zeitraum der Büroanwesenheit zurück.
+           Es gilt: 
+             Checkin vor Bürozeit -> Start = Bürozeit | Ende = Start + max Aufenthaltsdauer
+             Checkin während der Bürozeit -> Start = Aktuelle Zeit | Ende = Aktuelle Zeit + max Aufenthaltsdauer oder Ende Bürozeit
+        """
         b_hour = int(self.context.beginn.split(':')[0])
         b_minutes = int(self.context.beginn.split(':')[1])
         beginn = datetime.time(b_hour, b_minutes)
@@ -73,6 +79,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
             return None
 
     def check_persons(self, email, checktimes):
+        """ Prüft die anwesenden Checkins und legt wenn es geht einen neuen Checkin an"""
         date_range = {
             'query': (
                 DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(0,0))),
