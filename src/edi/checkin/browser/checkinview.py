@@ -110,7 +110,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         objjson = {'@type':'Checkin', 'id':objid, 'title':email, 'start':checktimes[0].isoformat(), 'end':checktimes[1].isoformat()}
         try:
             retcode = requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
-                                    json=objjson, auth=('admin', 'krks.d3print'))
+                                    json=objjson, auth=('admin', 'admin'))
             status = retcode.status_code
         except:
             print('Error Second Request')
