@@ -7,7 +7,6 @@ from z3c.form import button, form, field
 from plone.supermodel import model
 from plone.autoform import directives
 from plone.autoform.form import AutoExtensibleForm
-from collective.beaker.interfaces import ISession
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile as FiveViewPageTemplateFile
 from plone import api as ploneapi
 import z3c.form

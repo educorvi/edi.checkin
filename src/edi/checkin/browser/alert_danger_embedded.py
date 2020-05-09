@@ -755,7 +755,7 @@ def create_userbody(data, title):
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p><strong>Du hast bis zum edi__datum keinen Zutritt zum Office edi__title</strong></p>
+                        <p><strong>Du hast bis zum edi__datum keinen Zutritt zum Raum edi__title</strong></p>
                         <p>Du darfst den Checkin nur wiederholen, wenn Du versehentlich falsche Angaben gemacht hast.</p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>

@@ -18,17 +18,27 @@ class IOffice(model.Schema):
                            value_type=schema.TextLine(),
                            required=False)
 
-    beginn = schema.TextLine(title=_(u"Frühester Arbeitsbeginn in diesem Office (Format: HH:MM)"),
+    beginn = schema.TextLine(title=_(u"Frühester Zutritt zu diesem Raum (Format: HH:MM)"),
                              required=True)
 
-    ende = schema.TextLine(title=_(u"Spätestes Arbeitsende in diesem Office (Format: HH:MM)"),
+    ende = schema.TextLine(title=_(u"Späteste Schließung des Raumes (Format: HH:MM)"),
                            required=True)
 
-    maxtime = schema.Int(title=_(u"Maximale Aufenthaltsdauer pro Person in diesem Office (Format: H)"),
+    maxtime = schema.Int(title=_(u"Maximale Aufenthaltsdauer pro Person in diesem Raum"),
+                         description=_(u"Angaben von 1-24 werden als Stunden, darüber hinaus als Minuten interpretiert."),
+                         required=True)
+
+    maxperson = schema.Int(title=_(u"Maximale Anzahl von Personen in diesem Raum"),
                            required=True)
 
-    maxperson = schema.Int(title=_(u"Maximale Bürobesetzung in Personen an Arbeitstagen"),
-                           required=True)
+    overtime = schema.Int(title=_(u"Zeitzugabe in Minuten für Raumwechsel, Verspätungen und Verzögerungen"),
+                          description=_(u"Die Zeitzugabe wird nur bei den internen Berechnungen zur maximalen Raumbesetzung verwendet.\
+                          Die Angabe von 0 heisst: keine Zeitzugabe."),
+                          default=0,
+                          required=True)
+
+    wunschzeit = schema.Bool(title=_(u"Das Feld markieren, wenn die Person eine Wunschzeit auswählen soll"),
+                          description=_(u"Die Wunschzeit wird innerhalb der Raumöffnungszeit in 15 Minuten Schritten zur Auswahl angeboten.")) 
 
 
 @implementer(IOffice)

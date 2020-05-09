@@ -9,7 +9,6 @@ from z3c.form import button, form, field
 from plone.supermodel import model
 from plone.autoform import directives
 from plone.autoform.form import AutoExtensibleForm
-from collective.beaker.interfaces import ISession
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile as FiveViewPageTemplateFile
 from plone import api as ploneapi
 import z3c.form
@@ -41,7 +40,7 @@ class ICheckin(model.Schema):
 class CheckinForm(AutoExtensibleForm, form.Form):
 
     label = _(u"Check In")
-    description = _(u"Ein erfolgreich durchgeführter Checkin ist Voraussetzung für den Zutritt zu diesem Büro.\
+    description = _(u"Ein erfolgreich durchgeführter Checkin ist Voraussetzung für den Zutritt zu diesem Raum.\
                     Zur Gewährleistung des Infektionsschutzes besteht eine Pflicht zu wahren und vollständigen Angaben.")
 
     ignoreContext = True
@@ -49,79 +48,144 @@ class CheckinForm(AutoExtensibleForm, form.Form):
     schema = ICheckin
 
     def check_times(self):
-        """Prueft, ob der Checkin vor oder während der Bürozeit erfolgt und gibt den möglichen
-           Zeitraum der Büroanwesenheit zurück.
+        """Prueft, ob der Checkin vor oder während der Öffnungszeit erfolgt und gibt den möglichen
+           Zeitraum der Anwesenheit zurück.
            Es gilt: 
-             Checkin vor Bürozeit -> Start = Bürozeit | Ende = Start + max Aufenthaltsdauer
-             Checkin während der Bürozeit -> Start = Aktuelle Zeit | Ende = Aktuelle Zeit + max Aufenthaltsdauer oder Ende Bürozeit
+             Checkin vor Öffnungszeit -> Start = Bürozeit | Ende = Start + max Aufenthaltsdauer
+             Checkin während der Öffnungszeit -> Start = Aktuelle Zeit | Ende = Aktuelle Zeit + max Aufenthaltsdauer oder Ende Bürozeit
         """
-        b_hour = int(self.context.beginn.split(':')[0])
-        b_minutes = int(self.context.beginn.split(':')[1])
-        beginn = datetime.time(b_hour, b_minutes)
-        e_hour = int(self.context.ende.split(':')[0])
-        e_minutes = int(self.context.ende.split(':')[1])
-        ende = datetime.time(e_hour, e_minutes)
+        start_hour = int(self.context.beginn.split(':')[0])
+        start_minutes = int(self.context.beginn.split(':')[1])
+        beginn = datetime.time(start_hour, start_minutes)
+        end_hour = int(self.context.ende.split(':')[0])
+        end_minutes = int(self.context.ende.split(':')[1])
+        ende = datetime.time(end_hour, end_minutes)
         heute = datetime.date.today()
         jetzt = datetime.time(datetime.datetime.now().hour, datetime.datetime.now().minute)
+        timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
         if jetzt <= beginn:
-            start = datetime.datetime.combine(heute, beginn)
-            end = datetime.datetime.combine(heute, beginn) + datetime.timedelta(hours=self.context.maxtime)
+            start = datetime.datetime.combine(heute, beginn, tzinfo=timezone)
+            if self.context.maxtime <= 24:
+                end = datetime.datetime.combine(heute, beginn, tzinfo=timezone) + datetime.timedelta(hours=self.context.maxtime)
+            else:
+                end = datetime.datetime.combine(heute, beginn, tzinfo=timezone) + datetime.timedelta(minutes=self.context.maxtime)
             return (start, end)
         elif beginn < jetzt < ende:
-            start = datetime.datetime.combine(heute, jetzt)
-            finaltime = datetime.datetime.combine(heute, ende)
-            if (start + datetime.timedelta(hours=self.context.maxtime)) <= finaltime:
-                end = start + datetime.timedelta(hours=self.context.maxtime)
+            start = datetime.datetime.combine(heute, jetzt, tzinfo=timezone)
+            finaltime = datetime.datetime.combine(heute, ende, tzinfo=timezone)
+            end = finaltime
+            if self.context.maxtime <= 24:
+                if (start + datetime.timedelta(hours=self.context.maxtime)) <= finaltime:
+                    end = start + datetime.timedelta(hours=self.context.maxtime)
             else:
-                end = finaltime
+                if (start + datetime.timedelta(minutes=self.context.maxtime)) <= finaltime:
+                    end = start + datetime.timedelta(minutes=self.context.maxtime)
             return (start, end)
         else:
             return None
 
-    def check_persons(self, email, checktimes):
-        """ Prüft die anwesenden Checkins und legt wenn es geht einen neuen Checkin an"""
-        date_range = {
-            'query': (
-                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(0,0))),
-                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(23,59))),
-            ),
-            'range': 'min:max',
-        }
-        office_path = '/'.join(self.context.getPhysicalPath())
+    def alternate_checktimes(self, checktimes):
+        """ Sucht innerhalb der Öffnungszeit in 5 Minuten Schritten nach alternativen Checkinzeiten. 
+        """
         portal_catalog = ploneapi.portal.get_tool('portal_catalog')
-        brains = portal_catalog.unrestrictedSearchResults(portal_type="Checkin", path=office_path, start=date_range, Title=email)
+        office_path = '/'.join(self.context.getPhysicalPath())
+        end_hour = int(self.context.ende.split(':')[0])
+        end_minutes = int(self.context.ende.split(':')[1])
+        ende = datetime.time(end_hour, end_minutes)
+        heute = datetime.date.today()
+        timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+        schliessung = datetime.datetime.combine(heute, ende, tzinfo=timezone)
+        available_time = True
+        check_start = checktimes[0]
+        check_end = checktimes[1]
+        while available_time:
+            check_start = check_start + datetime.timedelta(minutes=5)
+            check_end = check_end + datetime.timedelta(minutes=5)
+            query_current = {}
+            if self.context.maxtime <= 24:
+                query_current['start'] = {'query':(
+                     DateTime(check_start - datetime.timedelta(hours=self.context.maxtime) - datetime.timedelta(minutes=self.context.overtime)),
+                     DateTime(check_start + datetime.timedelta(minutes=1))),
+                     'range': 'min:max'}
+            else:
+                query_current['start'] = {'query':(
+                    DateTime(check_start - datetime.timedelta(minutes=self.context.maxtime) - datetime.timedelta(minutes=self.context.overtime)),
+                    DateTime(check_start + datetime.timedelta(minutes=1))),
+                    'range': 'min:max'}
+            query_current['portal_type'] = "Checkin"
+            query_current['path'] = office_path
+            brains = portal_catalog.unrestrictedSearchResults(**query_current)
+            print(query_current)
+            print(u'Weitere Abfrage:', len(brains))
+            if len(brains) < self.context.maxperson:
+                return (check_start, check_end) # neue Checkinzeit wird zurückgegeben
+            else:
+                if self.context.maxtime <= 24:
+                    if schliessung - datetime.timedelta(hours=self.context.maxtime) < check_start:
+                        available_time = False
+                else:
+                    if schliessung - datetime.timedelta(minutes=self.context.maxtime) < check_start:
+                        available_time = False
+        return () # es wurde keine alternative Checkinzeit gefunden
+
+
+    def check_persons(self, email, checktimes):
+        """ Prüft die Checkins im Zeitraum und legt einen neuen Checkin an, wenn der Zeitraum verfügbar ist.
+        """
+        portal_catalog = ploneapi.portal.get_tool('portal_catalog')
+        office_path = '/'.join(self.context.getPhysicalPath())
+        query_current = {}
+        if self.context.maxtime <= 24:
+            query_current['start'] = {'query':(
+                DateTime(checktimes[0] - datetime.timedelta(hours=self.context.maxtime) - datetime.timedelta(minutes=self.context.overtime)),
+                DateTime(checktimes[0] + datetime.timedelta(minutes=1))),
+                'range': 'min:max'}
+        else:
+            query_current['start'] = {'query':(
+                DateTime(checktimes[0] - datetime.timedelta(minutes=self.context.maxtime) - datetime.timedelta(minutes=self.context.overtime)),
+                DateTime(checktimes[0] + datetime.timedelta(minutes=1))),
+                'range': 'min:max'}
+        query_current['portal_type'] = "Checkin"
+        query_current['path'] = office_path
+        query_current['Title'] = email
+        brains = portal_catalog.unrestrictedSearchResults(**query_current)
         if len(brains) > 0:
             return {'status':'warning', 'reason':u'alreadychecked'}
-        brains = portal_catalog.unrestrictedSearchResults(portal_type="Checkin", path=office_path, start=date_range)
+        del query_current['Title']
+        print(query_current)
+        brains = portal_catalog.unrestrictedSearchResults(**query_current)
+        print(u'Erste Abfrage:', len(brains))
         if len(brains) >= self.context.maxperson:
-            return {'status':'warning', 'reason':u'maxpersons'}
-        retcode = self.create_checkin(email, checktimes)
+            checktimes = self.alternate_checktimes(checktimes)
+            if checktimes:
+                retcode = self.create_checkin(email, checktimes)
+            else:
+                return {'status':'warning', 'reason':u'maxpersons'}
+        else:
+            retcode = self.create_checkin(email, checktimes)
         if retcode == 201:
-            return {'status':'success'}
+            return {'status':'success', 'times':checktimes}
         return {'status':'error'}
 
     def create_checkin(self, email, checktimes):
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
         m = hashlib.sha256()
         m.update(portal)
-        m.update(datetime.date.today().isoformat().encode('utf-8'))
+        m.update(checktimes[0].isoformat().encode('utf-8'))
         m.update(email.encode('utf-8'))
         objid = m.hexdigest()
-        objjson = {'@type':'Checkin', 'id':objid, 'title':email, 'start':checktimes[0].isoformat(), 'end':checktimes[1].isoformat()}
-        try:
-            retcode = requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
-                                    json=objjson, auth=('admin', 'admin'))
-            status = retcode.status_code
-        except:
-            print('Error Second Request')
-            status = 500
+        endtime = checktimes[1] + datetime.timedelta(minutes=self.context.overtime)
+        objjson = {'@type':'Checkin', 'id':objid, 'title':email, 'start':checktimes[0].isoformat(), 'end':endtime.isoformat()}
+        retcode = requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
+                                json=objjson, auth=('admin', 'admin'))
+        status = retcode.status_code
         return status
 
     def create_qrcode(self, data, checktimes):
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
         m = hashlib.sha256()
         m.update(portal)
-        m.update(datetime.date.today().isoformat().encode('utf-8'))
+        m.update(checktimes[0].isoformat().encode('utf-8'))
         m.update(data.get('email').encode('utf-8'))
         checksum = m.hexdigest()
         url = self.context.absolute_url() + "/checkinchecker?checksum=%s" % checksum
@@ -173,7 +237,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
  
         if self.context.adressen:
             if data.get('email') not in self.context.adressen:
-                ploneapi.portal.show_message(message="Mit dieser E-Mail-Adresse kannst Du nicht in dieses Office einchecken.", 
+                ploneapi.portal.show_message(message="Mit dieser E-Mail-Adresse kannst Du nicht in diesen Raum einchecken.", 
                                              request=self.request, type='error')
                 return self.request.response.redirect(url)
 
@@ -187,13 +251,13 @@ class CheckinForm(AutoExtensibleForm, form.Form):
                     data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
                     data['reason'] = checkpersons.get('reason')
                 elif checkpersons.get('status') == u'success':
+                    checktimes = checkpersons.get('times')
                     data['status'] = u'success'
                     data['class'] = u'card border-success'
                     data['date'] = datetime.datetime.now().strftime('%d.%m.%Y')
                     data['start'] = checktimes[0].strftime('%H:%M')
                     data['end'] = checktimes[1].strftime('%H:%M')
                     data['qrimage'] = '<img src="cid:image1" alt="img" />'
-                    checkpersons = self.check_persons(data.get('email'), checktimes)
                 else:
                     ploneapi.portal.show_message(message="Ein Fehler ist aufgetreten. Bitte benachrichtige den Administrator.",
                                                  request=self.request, type='error')

@@ -21,7 +21,7 @@
             <div class="card-body">
               <h5 class="card-title" tal:condition="python: view.status == 'success'">
                  Du hast am <span tal:replace="view/date"/> in der Zeit von <span tal:replace="view/start"/> Uhr 
-                 bis <span tal:replace="view/end"/> Uhr Zutritt für das Office <span tal:replace="context/title"/></h5>
+                 bis <span tal:replace="view/end"/> Uhr Zutritt für den Raum <span tal:replace="context/title"/></h5>
               <p class="card-text" tal:condition="python: view.status == 'success'">Solltest Du versehentlich falsche Angaben gemacht haben 
                  musst Du den Checkin wiederholen.<br/><br>
                  Deinen <span tal:replace="context/title"/> Pass erhältst Du per E-Mail.</p>
