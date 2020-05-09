@@ -15,22 +15,18 @@ class CheckinChecker(BrowserView):
     # template = ViewPageTemplateFile('check_checkin.pt')
 
     def check(self):
-        date_range = {
-            'query': (
-                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(0,0))),
-                DateTime(datetime.datetime.combine(datetime.date.today(), datetime.time(23,59))),
-            ),
-            'range': 'min:max',
-        }
-        office_path = '/'.join(self.context.getPhysicalPath())
-        portal_catalog = ploneapi.portal.get_tool('portal_catalog')
-        brains = portal_catalog.unrestrictedSearchResults(portal_type="Checkin", path=office_path, id=self.request.get('checksum'))
-        if brains:
-            if brains[0].start <= datetime.datetime.now() <= brains[0].end:
-                return 'Valid'
-        return 'Not Valid'
+        test = self.context.get(self.request.get('checksum'))
+        if test:
+            return True 
+        return False
 
     def __call__(self):
         # Implement your own actions:
-        self.msg = self.check()
+        check = self.check()
+        if check:
+            self.msg = 'Der Pass ist gültig'
+            self.cssclass = 'display-4 bg-success text-white p-4'
+        else:
+            self.msg = 'Der Pass ist ungültig'
+            self.cssclass = 'display-4 bg-danger text-white p-4'
         return self.index()

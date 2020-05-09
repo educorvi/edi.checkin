@@ -195,6 +195,9 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         return img
     
     def sendmails(self, data, checktimes):
+        portal = ploneapi.portal.get().absolute_url()
+        logo = portal + '/++theme++plonetheme.siguv/logo/bg-etem.svg'
+        checkinurl = self.context.absolute_url() 
         mime_msg = MIMEMultipart('related')
         mime_msg['Subject'] = u"Status des Checkins: %s (%s)" %(data.get('status'), data.get('email'))
         mime_msg['From'] = u"educorvi@web.de" #replace with portal from address
@@ -206,9 +209,9 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         mime_msg.attach(msgAlternative)
 
         if data.get('status') == 'success':
-            htmltext = successbody(data, checktimes, self.context.title)
+            htmltext = successbody(data, checktimes, self.context.title, portal, logo, checkinurl)
         else:
-            htmltext = dangerbody(data, self.context.title)
+            htmltext = dangerbody(data, self.context.title, portal, logo, checkinurl)
 
         msg_txt = MIMEText(htmltext, _subtype='html', _charset='utf-8')
         msgAlternative.attach(msg_txt)

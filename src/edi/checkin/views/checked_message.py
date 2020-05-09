@@ -16,4 +16,5 @@ class CheckedMessage(BrowserView):
         self.status = self.request.get('status')
         self.cssclass = self.request.get('class')
         self.date = self.request.get('date')
+        self.raum = self.context.title
         return self.index()

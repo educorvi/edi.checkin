@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def create_userbody(data, checktimes, title):
+def create_userbody(data, checktimes, title, portal, logo, checkinurl):
     successbody = """\
 <!doctype html>
 <html>
@@ -728,7 +728,7 @@ def create_userbody(data, checktimes, title):
               <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td class="align-center">
-                    <a href="https://www.educorvi.de" target="_blank"><img src="https://www.educorvi.de/@@site-logo/educorvi_280.png"</a>
+                    <a href="edi__portal" target="_blank"><img src="edi__logo"</a>
                   </td>
                 </tr>
               </table>
@@ -755,7 +755,7 @@ def create_userbody(data, checktimes, title):
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <p><strong>Du hast am edi__datum in der Zeit von edi__start Uhr - edi__end Uhr Zutritt zum Office edi__title.</strong></p>
+                        <p><strong>Du hast am edi__datum in der Zeit von edi__start Uhr - edi__end Uhr Zutritt zum Raum edi__title.</strong></p>
                         <p>Du musst den Checkin wiederholen, wenn Du versehentlich falsche Angaben gemacht hast.
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
@@ -766,7 +766,7 @@ def create_userbody(data, checktimes, title):
                                     <tr>
                                       <td> edi__qrimage </td>
                                     <tr>
-                                      <td> <a href="https://www.educorvi.de/checkin" target="_blank">Checkin wiederholen</a> </td>
+                                      <td> <a href="edi__checkinurl" target="_blank">Checkin wiederholen</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -774,7 +774,7 @@ def create_userbody(data, checktimes, title):
                             </tr>
                           </tbody>
                         </table>
-                        <p>educorvi wurde über den erfolgreichen Checkin informiert.</p>
+                        <p>Der erfolgreiche Checkin wurde registriert.</p>
                       </td>
                     </tr>
                   </table>
@@ -815,4 +815,7 @@ def create_userbody(data, checktimes, title):
     successbody = successbody.replace('edi__start', checktimes[0].strftime('%H:%M'))
     successbody = successbody.replace('edi__end', checktimes[1].strftime('%H:%M'))
     successbody = successbody.replace('edi__title', title)
+    successbody = successbody.replace('edi__portal', portal)
+    successbody = successbody.replace('edi__logo', logo)
+    successbody = successbody.replace('edi__checkinurl', checkinurl)
     return successbody

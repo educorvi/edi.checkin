@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def create_userbody(data, title):
+def create_userbody(data, title, portal, logo, checkinurl):
     dangerbody = """\
 <!doctype html>
 <html>
@@ -728,7 +728,7 @@ def create_userbody(data, title):
               <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td class="align-center">
-                    <a href="https://educorvi.de" target="_blank"><img src="https://www.educorvi.de/@@site-logo/educorvi_280.png" alt="Logo" align="center"></a>
+                    <a href="edi__portal" target="_blank"><img src="edi__logo" alt="Logo" align="center"></a>
                   </td>
                 </tr>
               </table>
@@ -764,7 +764,7 @@ def create_userbody(data, title):
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td> <a href="https://www.educorvi.de/checkin" target="_blank">Checkin wiederholen</a> </td>
+                                      <td> <a href="edi__checkinurl" target="_blank">Checkin wiederholen</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -772,7 +772,7 @@ def create_userbody(data, title):
                             </tr>
                           </tbody>
                         </table>
-                        <p>educorvi wurde nicht über den Grund des fehlgeschlagenen Checkins informiert.</p>
+                        <p>Der fehlgeschlagenen Checkin wurde registriert. Der Grund für die Ablehnung wurde nicht gespeichert.</p>
                       </td>
                     </tr>
                   </table>
@@ -809,4 +809,7 @@ def create_userbody(data, title):
 </html>"""
     dangerbody = dangerbody.replace('edi__datum', data.get('date'))
     dangerbody = dangerbody.replace('edi__title', title)
+    dangerbody = dangerbody.replace('edi__portal', portal)
+    dangerbody = dangerbody.replace('edi__logo', logo)
+    dangerbody = dangerbody.replace('edi__checkinurl', checkinurl)
     return dangerbody

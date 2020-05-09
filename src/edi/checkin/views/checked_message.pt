@@ -20,18 +20,19 @@
          </div>
             <div class="card-body">
               <h5 class="card-title" tal:condition="python: view.status == 'success'">
-                 Du hast am <span tal:replace="view/date"/> in der Zeit von 8:45 Uhr bis 15:15 Uhr Zutritt zur LetraFactory</h5>
+                 Du hast am <span tal:replace="view/date"/> in der Zeit von 8:45 Uhr bis 15:15 Uhr Zutritt zum Raum <span tal:replace="view/raum"/>.
+              </h5>
               <p class="card-text" tal:condition="python: view.status == 'success'">Solltest Du versehentlich falsche Angaben gemacht haben 
                  musst Du den Checkin wiederholen.<br/><br>
-                 Deinen LetraFactory Pass erhältst Du per E-Mail.</p>
+                 Deinen <span tal:replace="view/raum"/> Pass erhältst Du per E-Mail.</p>
               <h5 class="card-title" tal:condition="python: view.status == 'fail'">
-                 Du hast bis zum <span tal:replace="view/date"/> keinen Zutritt zur LetraFactory. </h5>
+                 Du hast bis zum <span tal:replace="view/date"/> keinen Zutritt zum Raum <span tal:replace="view/raum"/>.</h5>
               <p class="card-text" tal:condition="python: view.status == 'fail'">Du darfst den Checkin nur wiederholen,
                  wenn Du versehentlich falsche Angaben gemacht hast.</p>
               <h5 class="card-title" tal:condition="python: view.status == 'warning'">
                  Am heutigen Tag (<span tal:replace="view/date"/>) ist kein Checkin mehr möglich. </h5>
-              <p class="card-text" tal:condition="python: view.status == 'warning'">Ein Checkin ist nur für den aktuellen Arbeitstag und
-                 auch nur vor oder während der täglichen Bürozeit möglich.</p>
+              <p class="card-text" tal:condition="python: view.status == 'warning'">Ein Checkin ist nur für den aktuellen Tag und
+                 auch nur vor oder während der täglichen Öffnungszeit möglich.</p>
             </div>
         </div>
 
