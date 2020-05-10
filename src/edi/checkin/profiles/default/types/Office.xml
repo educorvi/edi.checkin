@@ -7,10 +7,10 @@
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">Office</property>
+      name="title">Raum</property>
   <property
       i18n:translate=""
-      name="description">An Office you can checkin into</property>
+      name="description">Ein Raum der einen Checkin erlaubt.</property>
 
   <property name="allow_discussion">False</property>
   <property name="factory">Office</property>
@@ -22,7 +22,7 @@
   <property name="filter_content_types">True</property>
   <property name="allowed_content_types">
     <element value="Veranstaltung" />
-        <element value="Checkin" />
+     <element value="Checkin" />
   </property>
   <!-- Schema, class and security -->
   <property name="add_permission">edi.checkin.AddOffice</property>

@@ -25,6 +25,11 @@
     permission="zope2.View"
   />
 
-
+  <browser:page
+    name="event-check-in"
+    for="edi.checkin.content.veranstaltung.IVeranstaltung"
+    class=".eventcheckinview.CheckinForm"
+    permission="zope2.View"
+  />
 
 </configure>
