@@ -7,6 +7,14 @@
   -*- extra stuff goes here -*-
 
   <browser:page
+    name="events-view"
+    for="Products.CMFCore.interfaces.IFolderish"
+    class=".events_view.EventsView"
+    template="events_view.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
     name="checkcheckin"
     for="*"
     class=".check_checkin.CheckCheckin"

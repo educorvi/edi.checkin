@@ -12,6 +12,9 @@ class IOffice(model.Schema):
     """ Marker interface and Dexterity Python Schema for Office
     """
 
+    notification_mail = schema.TextLine(title=_(u"E-Mail-Adresse für Benachrichtigungen über fehlgeschlagene Checkins"),
+                                        required=True)
+
     adressen = schema.List(title=_(u"Gültige E-Mail-Adressen für diesen Raum"),
                            description=_(u"Hier legen Sie fest, welche Adressen für diesen Raum einchecken dürfen. Wenn hier keine\
                                          Adressen eingetragen wurden findet auch keine Überprüfung der Adressen statt."),

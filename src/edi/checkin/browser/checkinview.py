@@ -200,9 +200,9 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         checkinurl = self.context.absolute_url() 
         mime_msg = MIMEMultipart('related')
         mime_msg['Subject'] = u"Status des Checkins: %s (%s)" %(data.get('status'), data.get('email'))
-        mime_msg['From'] = u"educorvi@web.de" #replace with portal from address
+        mime_msg['From'] = ploneapi.portal.get_registry_record('plone.email_from_address')
         if data.get('status') == 'fail':
-            mime_msg['CC'] = 'info@educorvi.de'
+            mime_msg['CC'] = self.context.notification_mail
         mime_msg['To'] = data.get('email')
         mime_msg.preamble = 'This is a multi-part message in MIME format.'
         msgAlternative = MIMEMultipart('alternative')
