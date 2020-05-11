@@ -7,26 +7,10 @@
   -*- extra stuff goes here -*-
 
   <browser:page
-    name="checkcheckin"
-    for="*"
-    class=".check_checkin.CheckCheckin"
-    template="check_checkin.pt"
-    permission="zope2.View"
-    />
-
-  <browser:page
-    name="checkinchecker"
-    for="*"
-    class=".checkinchecker.CheckinChecker"
-    template="checkinchecker.pt"
-    permission="zope2.View"
-    />
-
-  <browser:page
-    name="checked-message"
-    for="*"
-    class=".checked_message.CheckedMessage"
-    template="checked_message.pt"
+    name="events-view"
+    for="edi.checkin.content.office.IOffice"
+    class=".events_view.EventsView"
+    template="events_view.pt"
     permission="zope2.View"
     />
 
@@ -39,10 +23,11 @@
     />
 
   <browser:page
-    name="checkin-test"
+    name="checkinchecker"
     for="*"
-    class=".checkinform.CheckinForm"
+    class=".checkinchecker.CheckinChecker"
+    template="checkinchecker.pt"
     permission="zope2.View"
-  />
+    />
 
 </configure>

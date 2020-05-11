@@ -21,19 +21,19 @@
             <div class="card-body">
               <h5 class="card-title" tal:condition="python: view.status == 'success'">
                  Du hast am <span tal:replace="view/date"/> in der Zeit von <span tal:replace="view/start"/> Uhr 
-                 bis <span tal:replace="view/end"/> Uhr Zutritt für das Office <span tal:replace="context/title"/></h5>
+                 bis <span tal:replace="view/end"/> Uhr Zutritt für den Raum <span tal:replace="context/title"/>.</h5>
               <p class="card-text" tal:condition="python: view.status == 'success'">Solltest Du versehentlich falsche Angaben gemacht haben 
                  musst Du den Checkin wiederholen.<br/><br>
                  Deinen <span tal:replace="context/title"/> Pass erhältst Du per E-Mail.</p>
               <h5 class="card-title" tal:condition="python: view.status == 'fail'">
-                 Du hast bis zum <span tal:replace="view/date"/> keinen Zutritt zur LetraFactory. </h5>
+                 Du hast bis zum <span tal:replace="view/date"/> keinen Zutritt zum Raum <span tal:replace="context/title"/>. </h5>
               <p class="card-text" tal:condition="python: view.status == 'fail'">Du darfst den Checkin nur wiederholen,
                  wenn Du versehentlich falsche Angaben gemacht hast.</p>
 
               <h5 class="card-title" tal:condition="python: view.status == 'warning' and view.reason == 'outoftime'">
                  Am heutigen Tag (<span tal:replace="view/date"/>) ist kein Checkin mehr möglich. </h5>
               <p class="card-text" tal:condition="python: view.status == 'warning' and view.reason == 'outoftime'">Ein Checkin ist 
-                 nur für den aktuellen Arbeitstag und auch nur vor oder während der täglichen Bürozeit möglich.</p>
+                 nur für den aktuellen Tag und auch nur vor oder während der täglichen Öffnungszeit möglich.</p>
 
               <h5 class="card-title" tal:condition="python: view.status == 'warning' and view.reason == 'alreadychecked'">
                  Du bist für den heutigen Tag (<span tal:replace="view/date"/>) bereits eingechecked </h5>

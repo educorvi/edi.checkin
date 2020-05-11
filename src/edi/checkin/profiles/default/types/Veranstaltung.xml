@@ -1,35 +1,34 @@
 <?xml version="1.0"?>
 <object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    name="Office"
+    name="Veranstaltung"
     meta_type="Dexterity FTI"
     i18n:domain="edi.checkin">
 
   <!-- Basic properties -->
   <property
       i18n:translate=""
-      name="title">Raum</property>
+      name="title">Veranstaltung</property>
   <property
       i18n:translate=""
-      name="description">Ein Raum der einen Checkin erlaubt.</property>
+      name="description">Veranstaltungen in einem Raum</property>
 
   <property name="allow_discussion">False</property>
-  <property name="factory">Office</property>
+  <property name="factory">Veranstaltung</property>
   <property name="icon_expr"></property>
   <property name="link_target"></property>
 
   <!-- Hierarchy control -->
-  <property name="global_allow">True</property>
+  <property name="global_allow">False</property>
   <property name="filter_content_types">True</property>
   <property name="allowed_content_types">
-    <element value="Veranstaltung" />
-     <element value="Checkin" />
+    <element value="Checkin" />
   </property>
   <!-- Schema, class and security -->
-  <property name="add_permission">edi.checkin.AddOffice</property>
-  <property name="klass">edi.checkin.content.office.Office</property>
+  <property name="add_permission">edi.checkin.AddVeranstaltung</property>
+  <property name="klass">edi.checkin.content.veranstaltung.Veranstaltung</property>
   <property name="model_file"></property>
   <property name="model_source"></property>
-  <property name="schema">edi.checkin.content.office.IOffice</property>
+  <property name="schema">edi.checkin.content.veranstaltung.IVeranstaltung</property>
 
   <!-- Enabled behaviors -->
   <property name="behaviors" purge="false">
@@ -59,13 +58,12 @@
   </property>
 
   <!-- View information -->
-  <property name="add_view_expr">string:${folder_url}/++add++Office</property>
-  <property name="default_view">check-in</property>
+  <property name="add_view_expr">string:${folder_url}/++add++Veranstaltung</property>
+  <property name="default_view">event-check-in</property>
   <property name="default_view_fallback">False</property>
-  <property name="immediate_view">check-in</property>
+  <property name="immediate_view">event-check-in</property>
   <property name="view_methods">
-    <element value="check-in"/>
-    <element value="events-view"/>
+    <element value="event-check-in"/>
   </property>
 
   <!-- Method aliases -->

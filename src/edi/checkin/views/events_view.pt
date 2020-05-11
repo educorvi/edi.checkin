@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="example.conference">
+<body>
+
+<metal:main fill-slot="main">
+    <tal:main-macro metal:define-macro="main">
+
+      <div class="container">
+
+        <div tal:replace="structure provider:plone.abovecontenttitle" />
+
+        <h1 class="documentFirstHeading" tal:content="context/title" />
+
+        <p class="documentDescription" tal:content="context/description" />
+
+        <div tal:replace="structure provider:plone.abovecontentbody" />
+
+        <h2>Kommende Besprechungen in diesem Raum</h2>
+
+		<div class="card mb-3" tal:repeat="veranstaltung view/veranstaltungen">
+		  <div class="row no-gutters">
+		    <div class="col-md-4 p-4 bg-success text-white">
+		      <h1 class="display-4" tal:content="veranstaltung/day"/>
+                      <h2 tal:content="veranstaltung/time"/>
+		    </div>
+		    <div class="col-md-8">
+		      <div class="card-body">
+			<h5 class="card-title" tal:content="veranstaltung/title"> </h5>
+			<p class="card-text" tal:content="veranstaltung/description"> </p>
+                        <a tal:attributes="href veranstaltung/url; class veranstaltung/btnclass">zum Checkin</a>
+                        <p class="card-text mt-3"><small class="text-muted" tal:content="veranstaltung/comment"></small></p>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+        <div tal:replace="structure provider:plone.belowcontentbody" />
+
+      </div>
+
+    </tal:main-macro>
+</metal:main>
+
+</body>
+</html>      

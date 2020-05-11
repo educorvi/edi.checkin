@@ -20,22 +20,22 @@ class ViewsIntegrationTest(unittest.TestCase):
         api.content.create(self.portal, 'Folder', 'other-folder')
         api.content.create(self.portal, 'Document', 'front-page')
 
-    def test_checked_message_is_registered(self):
+    def test_events_view_is_registered(self):
         view = getMultiAdapter(
             (self.portal['other-folder'], self.portal.REQUEST),
-            name='checked-message'
+            name='events-view'
         )
-        self.assertTrue(view.__name__ == 'checked-message')
+        self.assertTrue(view.__name__ == 'events-view')
         # self.assertTrue(
         #     'Sample View' in view(),
-        #     'Sample View is not found in checked-message'
+        #     'Sample View is not found in events-view'
         # )
 
-    def test_checked_message_not_matching_interface(self):
+    def test_events_view_not_matching_interface(self):
         with self.assertRaises(ComponentLookupError):
             getMultiAdapter(
                 (self.portal['front-page'], self.portal.REQUEST),
-                name='checked-message'
+                name='events-view'
             )
 
 

@@ -7,6 +7,12 @@
   <!-- -*- extra stuff goes here -*- -->
 
     <permission
+        id="edi.checkin.AddVeranstaltung"
+        title="edi.checkin: Add Veranstaltung"
+    />
+
+
+    <permission
         id="edi.checkin.AddCheckin"
         title="edi.checkin: Add Checkin"
     />

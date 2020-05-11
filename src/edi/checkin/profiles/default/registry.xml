@@ -4,5 +4,6 @@
     i18n:domain="edi.checkin">
 
 <!-- -*- extra stuff goes here -*- -->
+    <records interface="edi.checkin.browser.settings.ICheckinSettings" prefix="edi.checkin.browser.settings.ICheckinSettings"/>
 
 </registry>

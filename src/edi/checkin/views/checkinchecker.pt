@@ -6,8 +6,8 @@
       metal:use-macro="context/main_template/macros/master">
 <body>
   <metal:block fill-slot="content-core">
-      <h2 i18n:translate="">Prüfung des Zugangs zur LetraFactory</h2>
-      <h1 class="display-4" tal:content="view/msg">this gets replaced</h1>
+      <h2 i18n:translate="">Prüfung des Zugangs zum Raum <span tal:replace="context/title"/></h2>
+      <h1 class="" tal:attributes="class view/cssclass" tal:content="view/msg">this gets replaced</h1>
   </metal:block>
 </body>
 </html>
