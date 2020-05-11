@@ -32,4 +32,11 @@
     permission="zope2.View"
   />
 
+  <browser:page
+    name="checkin-settings"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".settings.CheckinSettingsView"
+    permission="cmf.ManagePortal"
+  />
+
 </configure>
