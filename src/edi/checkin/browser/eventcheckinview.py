@@ -21,20 +21,9 @@ from base64 import encodestring
 from plone import api as ploneapi
 import plone.app.z3cform
 import plone.z3cform.templates
-
+from edi.checkin.browser.checkinview import ICheckin
 
 from edi.checkin import _
-
-class ICheckin(model.Schema):
-
-    email = schema.TextLine(title=_(u"Meine E-Mail-Adresse"), required=True)
-    rules = schema.Bool(title=_(u"Ich habe die Regeln zum Infektionsschutz befolgt. Es gelten die Regeln des Bundeslandes in dem Du wohnst."), 
-                        description=_(u"Es gelten die Regeln des Bundeslandes indem Du Deinen Hauptwohnsitz hast."),
-                        required=True)
-
-    healthy = schema.Bool(title=_(u"Ich fühle mich gesund und fit. Ich habe keine Erkältungssymptome. Ich habe kein Fieber oder trockenen Husten."),
-                         description=_(u"Ich habe keine Erkältungssymptome. Ich habe kein Fieber und keinen trockenen Husten."),
-                         required=True)
 
 
 class CheckinForm(AutoExtensibleForm, form.Form):
@@ -88,7 +77,6 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         del query_current['Title']
         print(query_current)
         brains = portal_catalog.unrestrictedSearchResults(**query_current)
-        print(u'Abfrage:', len(brains))
         if len(brains) >= self.context.maxperson:
             return {'status':'warning', 'reason':u'maxpersons'}
         else:
@@ -98,6 +86,8 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         return {'status':'error'}
 
     def create_checkin(self, email, checktimes):
+        adminuser = ploneapi.portal.get_registry_record('edi.checkin.browser.settings.ICheckinSettings.adminuser')
+        adminpassword = ploneapi.portal.get_registry_record('edi.checkin.browser.settings.ICheckinSettings.adminpassword')
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
         m = hashlib.sha256()
         m.update(portal)
@@ -107,7 +97,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         endtime = checktimes[1] + datetime.timedelta(minutes=self.context.overtime)
         objjson = {'@type':'Checkin', 'id':objid, 'title':email, 'start':checktimes[0].isoformat(), 'end':endtime.isoformat()}
         retcode = requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
-                                json=objjson, auth=('admin', 'admin'))
+                                json=objjson, auth=(adminuser, adminpassword))
         status = retcode.status_code
         return status
 
@@ -119,10 +109,10 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         m.update(data.get('email').encode('utf-8'))
         checksum = m.hexdigest()
         url = self.context.absolute_url() + "/checkinchecker?checksum=%s" % checksum
-        filename = "qr.png" #here we need a Temporary File
+        filehandle = tempfile.TemporaryFile()
         img = qrcode.make(url)
-        img.save(filename)
-        return img
+        img.save(filehandle)
+        return filehandle
     
     def sendmails(self, data, checktimes):
         portal = ploneapi.portal.get().absolute_url()
@@ -148,11 +138,9 @@ class CheckinForm(AutoExtensibleForm, form.Form):
 
 
         if data.get('status') == 'success':
-            img = self.create_qrcode(data, checktimes)
-            qrimage = open('qr.png', 'rb')
-            qrimage.seek(0)
-            msgImage = MIMEImage(qrimage.read())
-
+            filehandle = self.create_qrcode(data, checktimes)
+            filehandle.seek(0)
+            msgImage = MIMEImage(filehandle.read())
             msgImage.add_header('Content-ID', '<image1>')
             mime_msg.attach(msgImage)
 
@@ -210,6 +198,10 @@ class CheckinForm(AutoExtensibleForm, form.Form):
             mails = self.sendmails(data, checktimes)
 
         url += '/checked-hint'
-        url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
-                                                               data.get('end'), data.get('reason'))        
+        url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), 
+                                                                         data.get('class'), 
+                                                                         data.get('date'), 
+                                                                         data.get('start'),
+                                                                         data.get('end'), 
+                                                                         data.get('reason'))        
         return self.request.response.redirect(url)
