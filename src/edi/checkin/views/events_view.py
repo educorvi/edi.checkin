@@ -3,14 +3,12 @@ import datetime
 from edi.checkin import _
 from Products.Five.browser import BrowserView
 from plone import api as ploneapi
-# from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
+from edi.checkin import _
 
 class EventsView(BrowserView):
 
-
     def get_upcoming_veranstaltungen(self):
-        
         entries = []
         eventquery = {'query': (datetime.datetime.now()), 'range':'min'}
         contents = ploneapi.content.find(context=self.context, portal_type="Veranstaltung", 
@@ -27,13 +25,11 @@ class EventsView(BrowserView):
                 entry['comment'] = u''
             else:
                 entry['btnclass'] = u'btn btn-primary btn-lg disabled'
-                entry['comment'] = u'Ein Checkin ist aus Gründen des Infektionsschutzes erst am Tag der Veranstaltung möglich'
+                entry['comment'] = _(u'Ein Checkin ist aus Gründen des Infektionsschutzes erst am Tag der Veranstaltung möglich')
             entries.append(entry)
         return entries
             
 
     def __call__(self):
-
-        # Implement your own actions:
         self.veranstaltungen = self.get_upcoming_veranstaltungen()
         return self.index()

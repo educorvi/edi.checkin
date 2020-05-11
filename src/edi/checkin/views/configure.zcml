@@ -15,10 +15,10 @@
     />
 
   <browser:page
-    name="checkcheckin"
+    name="checked-hint"
     for="*"
-    class=".check_checkin.CheckCheckin"
-    template="check_checkin.pt"
+    class=".checked_hint.CheckedMessage"
+    template="checked_hint.pt"
     permission="zope2.View"
     />
 
@@ -27,22 +27,6 @@
     for="*"
     class=".checkinchecker.CheckinChecker"
     template="checkinchecker.pt"
-    permission="zope2.View"
-    />
-
-  <browser:page
-    name="checked-message"
-    for="*"
-    class=".checked_message.CheckedMessage"
-    template="checked_message.pt"
-    permission="zope2.View"
-    />
-
-  <browser:page
-    name="checked-hint"
-    for="*"
-    class=".checked_hint.CheckedMessage"
-    template="checked_hint.pt"
     permission="zope2.View"
     />
 
