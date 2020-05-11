@@ -40,6 +40,12 @@
       name="edi.checkin-hiddenprofiles"
       />
 
+  <subscriber
+      for=".content.veranstaltung.IVeranstaltung
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".events.send_invitation"
+      />
+
   <!-- -*- extra stuff goes here -*- -->
 
   <include package=".views" />
