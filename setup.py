@@ -14,7 +14,7 @@ long_description = '\n\n'.join([
 
 setup(
     name='edi.checkin',
-    version='1.0a1',
+    version='1.0rc1',
     description="An add-on for Plone",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
