@@ -8,7 +8,7 @@
 
   <browser:page
     name="events-view"
-    for="Products.CMFCore.interfaces.IFolderish"
+    for="edi.checkin.content.office.IOffice"
     class=".events_view.EventsView"
     template="events_view.pt"
     permission="zope2.View"

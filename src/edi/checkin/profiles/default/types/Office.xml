@@ -65,6 +65,7 @@
   <property name="immediate_view">check-in</property>
   <property name="view_methods">
     <element value="check-in"/>
+    <element value="events-view"/>
   </property>
 
   <!-- Method aliases -->
