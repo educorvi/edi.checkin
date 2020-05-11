@@ -38,8 +38,8 @@ Features
 - Automatische Suche nach freien Zeiträumen für den Zugang zum Raum in 5 Minuten Schritten
 - View zur Bestätigung des Checkins bzw. zur Ablehnung des Zutritts zum Raum
 - E-Mail mit Check-In Pass incl. QR-Code zur Online-Prüfung der Gültigkeit 
-- E-Mail mit Bescheid bei Ablehnung des Zutritts*
-- Online-Verfahren zur Gültigkeitsprüfung des QR-Codes**
+- E-Mail mit Bescheid bei Ablehnung des Zutritts (siehe Kapitel Datenschutz)
+- Online-Verfahren zur Gültigkeitsprüfung des QR-Code (siehe Kapitel Prüfung des QR-Codes)
 - Durch Speicherung der "Checkin" Objekte im Ordner "Office" können nachträglich mögliche Infektionsketten zurückverfolgt werden
 
 Datenschutz
@@ -47,6 +47,18 @@ Datenschutz
 
 Bei abgelehnten Checkins erfolgt eine Benachrichtigung an die angegebene E-Mail-Adresse. In der E-Mail-Adresse wird der Grund der Ablehnung
 (Regelverstoss gegen den Infektionsschutz oder aufgetretene Krankheitssymptome) nicht gespeichert.
+
+Prüfung des QR-Codes
+--------------------
+
+Für die Prüfung des QR-Codes ist grundsätzlich keine zusätzliche Software erfoderlich. Es reicht die Kamera eines Tablets und ein Browser,
+der sich mit dem Portal verbindet. Wir empfehlen jedoch folgende App für die Prüfung des QR-Codes:
+
+- https://apps.apple.com/de/app/barcode-qr-code-scanner/id909883348
+- https://play.google.com/store/apps/details?id=com.teacapps.barcodescanner&gl=DE
+
+Diese App baut direkt und ohne zusätzliche Bedienung am Tablet die Verbindung zum Server zur Prüfung des QR-Codes auf. Die Bedienung ist damit
+nahezu analog zu Scannern möglich wie diese bei der Einlasskontrolle an Flughäfen bekannt sind.
 
 ToDo (Coming Soon)
 ------------------
@@ -61,6 +73,11 @@ Examples
 Ein Beispiel kann unter folgender URL aufgerufen werden:
 
 https://www.educorvi.de/letrafactory
+
+Video zu edi.checkin
+--------------------
+
+https://vimeo.com/417001194
 
 
 Translations
