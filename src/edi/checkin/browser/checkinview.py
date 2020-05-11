@@ -3,6 +3,7 @@ import datetime
 import requests
 import qrcode
 import hashlib
+import tempfile
 import z3c.form
 import plone.app.z3cform
 import plone.z3cform.templates
@@ -59,7 +60,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         """
         start_data = [int(i) for i in self.context.beginn.split(':')]
         beginn = datetime.time(start_data[0], start_data[1])
-        end_data = [int(i) for i in self.context.beginn.split(':')]
+        end_data = [int(i) for i in self.context.ende.split(':')]
         ende = datetime.time(end_data[0], end_data[1])
         heute = datetime.date.today() #Datum
         jetzt = datetime.time(datetime.datetime.now().hour, datetime.datetime.now().minute) #Uhrzeit
@@ -174,6 +175,8 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         return {'status':'error'}
 
     def create_checkin(self, email, checktimes):
+        adminuser = ploneapi.portal.get_registry_record('edi.checkin.browser.settings.ICheckinSettings.adminuser')
+        adminpassword = ploneapi.portal.get_registry_record('edi.checkin.browser.settings.ICheckinSettings.adminpassword')
         portal = ploneapi.portal.get().EffectiveDate().encode('utf-8')
         m = hashlib.sha256()
         m.update(portal)
@@ -183,7 +186,7 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         endtime = checktimes[1] + datetime.timedelta(minutes=self.context.overtime)
         objjson = {'@type':'Checkin', 'id':objid, 'title':email, 'start':checktimes[0].isoformat(), 'end':endtime.isoformat()}
         retcode = requests.post(self.context.absolute_url(), headers={'Accept': 'application/json', 'Content-Type': 'application/json'}, 
-                                json=objjson, auth=('admin', 'admin'))
+                                json=objjson, auth=(adminuser, adminpassword))
         status = retcode.status_code
         return status
 
@@ -195,10 +198,10 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         m.update(data.get('email').encode('utf-8'))
         checksum = m.hexdigest()
         url = self.context.absolute_url() + "/checkinchecker?checksum=%s" % checksum
-        filename = "qr.png" #here we need a Temporary File
+        filehandle = tempfile.TemporaryFile()
         img = qrcode.make(url)
-        img.save(filename)
-        return img
+        img.save(filehandle)
+        return filehandle
     
     def sendmails(self, data, checktimes):
         portal = ploneapi.portal.get().absolute_url()
@@ -222,13 +225,10 @@ class CheckinForm(AutoExtensibleForm, form.Form):
         msg_txt = MIMEText(htmltext, _subtype='html', _charset='utf-8')
         msgAlternative.attach(msg_txt)
 
-
         if data.get('status') == 'success':
-            img = self.create_qrcode(data, checktimes)
-            qrimage = open('qr.png', 'rb')
-            qrimage.seek(0)
-            msgImage = MIMEImage(qrimage.read())
-
+            filehandle = self.create_qrcode(data, checktimes)
+            filehandle.seek(0)
+            msgImage = MIMEImage(filehandle.read())
             msgImage.add_header('Content-ID', '<image1>')
             mime_msg.attach(msgImage)
 
@@ -287,6 +287,10 @@ class CheckinForm(AutoExtensibleForm, form.Form):
             mails = self.sendmails(data, checktimes)
 
         url += '/checked-hint'
-        url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), data.get('class'), data.get('date'), data.get('start'),
-                                                               data.get('end'), data.get('reason'))        
+        url += '?status=%s&class=%s&date=%s&start=%s&end=%s&reason=%s' %(data.get('status'), 
+                                                                         data.get('class'), 
+                                                                         data.get('date'), 
+                                                                         data.get('start'),
+                                                                         data.get('end'), 
+                                                                         data.get('reason'))        
         return self.request.response.redirect(url)
