@@ -15,8 +15,6 @@ Bitte beachten Sie, dass Sie erst am Veranstaltungstag einchecken können.
 
         sender = ploneapi.portal.get_registry_record('plone.email_from_address')
 
-        import pdb;pdb.set_trace()
-
         for i in veranstaltung.adressen:
             ploneapi.portal.send_email(
                 recipient=i,
